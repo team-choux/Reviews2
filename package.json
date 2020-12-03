@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "SDC",
   "version": "",
   "description": "",
   "author": "",
@@ -8,8 +8,10 @@
     "node": ">=6.13.0"
   },
   "scripts": {
+    "connect": "node ./src/connection.js"
   },
   "dependencies": {
+    "mongoose": "^5.11.2"
   },
   "devDependencies": {
     "eslint-config-hackreactor": "git://github.com/reactorcore/eslint-config-hackreactor"
