@@ -5,7 +5,6 @@ mongoose.connect('mongodb://localhost/reviewsDB', {
   useUnifiedTopology: true,
   useNewUrlParser:true});
 
-
 mongoose.connection
 //notifies on connection error
 .on('error', function(error){
@@ -15,3 +14,5 @@ mongoose.connection
 .once('open', function() {
   console.log('connection has been made');
 })
+
+

@@ -8,10 +8,14 @@
     "node": ">=6.13.0"
   },
   "scripts": {
-    "connect": "node ./src/connection.js"
+    "connect:mongo": "node ./SDC/database-mongodb/connectionMongoDB.js",
+    "connect:post": "node ./SDC/database-postgres/connectionPostgreSQL.js"
   },
   "dependencies": {
-    "mongoose": "^5.11.2"
+    "express": "^4.17.1",
+    "mongodb": "^3.6.3",
+    "mongoose": "^5.11.2",
+    "pg": "^8.5.1"
   },
   "devDependencies": {
     "eslint-config-hackreactor": "git://github.com/reactorcore/eslint-config-hackreactor"
