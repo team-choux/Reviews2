@@ -20,6 +20,7 @@ for this reason, it is often referred to as a “mini-app”.
 const port = 3000;
 
 
+app.use(express.json());
 app.use('/', routes);
 
 

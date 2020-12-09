@@ -1,7 +1,7 @@
 /*
 
 sudo su postgres
-psql -f SDC/database-postgres/schema.sql
+psql -f SDC/database-postgres/schema_import.sql
 
 */
 
@@ -11,7 +11,7 @@ psql -f SDC/database-postgres/schema.sql
 CREATE TABLE IF NOT EXISTS characteristics (
 id INT NOT NULL PRIMARY KEY,
 product_id INT NOT NULL,
-name CHAR(50));
+name VARCHAR(50));
 
 /*
 --copying csv files over.... COPY 3347478
@@ -20,6 +20,8 @@ FROM '/home/monica/Documents/HackReactor/Week8/CSVfiles/characteristics.csv'
 DELIMITER ','
 CSV HEADER;
 */
+
+create index product_idChar on characteristics(product_id);
 
 --create characteristics_reviews table (500.9 MB) --------------------------------------------------
 CREATE TABLE IF NOT EXISTS characteristics_reviews (
@@ -36,11 +38,19 @@ DELIMITER ','
 CSV HEADER;
 */
 
+create index characteristic_reviewsId on characteristics_reviews(review_id);
+
 --create reviews_photos table (393.6 MB) --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS reviews_photos (
   id INT NOT NULL PRIMARY KEY,
   review_id INT NOT NULL,
   url varchar(200) NOT NULL);
+
+--links up review_id with id in reviews table
+ALTER TABLE reviews_photos
+ADD FOREIGN KEY (review_id) REFERENCES reviews(id);
+
+
 
 /*
 --copying csv files over....COPY 2742832
@@ -62,7 +72,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   reported BOOLEAN NOT NULL,
   reviewer_name VARCHAR(60) NOT NULL,
   reviewer_email VARCHAR(100),
-  response CHAR(1000),
+  response VARCHAR(1000),
   helpfulness INT NOT NULL
   );
 
