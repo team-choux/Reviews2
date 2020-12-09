@@ -21,8 +21,10 @@ const db = pgp(connectionString);
 let getSpecificProductReviews = function (request, response, next) {
   //console.log(request.query);
 
-  //if the request has product_id in the query, carry out db query
-  if (request.query.hasOwnProperty('product_id')) {
+  //if the request does NOT have product_id in the query...
+  if (!request.query.hasOwnProperty('product_id')) {
+    response.send('Product ID must be defined');
+  } else {
     let productId = request.query.product_id;
     let productReview =
         {
@@ -32,50 +34,62 @@ let getSpecificProductReviews = function (request, response, next) {
           'results': []
         };
 
-    db.any(`select * from reviews where product_id=${productId}`)
+    //fields in original reviews table was NOT transformed so I manually transforming it using "AS" in the db query
+    db.any(`SELECT id AS review_id, rating, date, summary, body, recommended AS recommend, reviewer_name, response, helpfulness FROM reviews WHERE product_id=${productId} AND reported=false`)
       .then(function(reviews) {
 
         for (var i = 0; i < reviews.length; i++) {
-          if (reviews[i].reported === false) {
-
-            reviews[i].reviewId = reviews[i].id;
-            reviews[i].recommend = reviews[i].recommended;
-            reviews[i].photos = [];
-            delete reviews[i].recommended;
-            delete reviews[i].id;
-            delete reviews[i].product_id;
-            delete reviews[i].reported;
-            delete reviews[i].reviewer_email;
-
-            productReview.results.push(reviews[i]);
-          }
+          reviews[i].photos = [];
+          //if there is no response, sends back empty string instead of null
+          reviews[i].response = reviews[i].response ? reviews[i].response : '';
+          //sends back value in recommend as integer instead of boolean
+          reviews[i].recommend = reviews[i].recommend === true ? 1 : 0;
+          productReview.results.push(reviews[i]);
         }
-
-        response.send(productReview);
+        return db.any(`
+        SELECT reviews_photos.id, reviews_photos.review_id, reviews_photos.url
+        FROM reviews
+        INNER JOIN reviews_photos
+        ON reviews.id=reviews_photos.review_ID
+        WHERE product_id=${productId}`);
       })
-      .then(()=>{})
+      .then((photoUrlsForProductId)=>{
+        //if there are no photo urls associated with any url, send
+        if (photoUrlsForProductId.length === 0) {
+          response.send(productReview);
+        } else {
+
+          for (var i = 0; i < productReview.results.length; i++) {
+            for (var j = 0; j < photoUrlsForProductId.length; j++) {
+              if (productReview.results[i].review_id === photoUrlsForProductId[j].review_id) {
+                productReview.results[i].photos.push({
+                  'id': photoUrlsForProductId[j].id,
+                  'url': photoUrlsForProductId[j].url
+                });
+              }
+            }
+          }
+          response.send(productReview);
+        }
+      })
       .catch(function(err) {
         console.log('error in getAllTransactions in database index.js file');
         response.send(err);
         return next(err);
       });
-  } else {
-    //if the request does NOT have product_id in the query...
-    response.send('Product ID must be defined');
   }
 };
 
 
-let getSpecificProductMeta = function (request, response, next) {
+let getSpecificProductMeta = function (request, response) {
   if (request.query.hasOwnProperty('product_id')) {
     let productId = request.query.product_id;
 
     let metaData;
 
-
+    //NOTE: lines 95-114 are wordy but more efficient than trying to trying to make multiple db queries to the reviews table and using COUNT on each of the different star ratings. The meta table (which I created) has all that information condensed into a single line per product_id.  Queries to the meta table does not return information that is nested hence I am manually doing that here.  This meta table however does mean that for post requests, I will need to update two separate tables.
     db.any(`select * from meta where product_id=${productId}`)
       .then(function(rowFromMeta) {
-
         metaData = {
           'product_id': rowFromMeta[0].product_id,
           'ratings': {
@@ -98,21 +112,19 @@ let getSpecificProductMeta = function (request, response, next) {
         };
 
         return db.any(`select * from meta_characteristics where product_id=${productId}`);
-
       })
       .then((rowsFromMetaChar)=>{
         let characteristics = {};
 
         for (var i = 0; i < rowsFromMetaChar.length; i++) {
-
-          //due to how the database was created ...CHAR was used instead of VARCHAR
+          //due to how the database was created ...CHAR was used instead of VARCHAR (this has been fixed in the schema files for future imports)
           let characteristicName = rowsFromMetaChar[i].name.trim();
 
           if (characteristics.hasOwnProperty(characteristicName)) {
             characteristics[characteristicName].counter++;
-            characteristics[characteristicName] += rowsFromMetaChar[i].value;
+            characteristics[characteristicName].total += rowsFromMetaChar[i].value;
           } else {
-            characteristics[`"${characteristicName}"`] = {
+            characteristics[characteristicName] = {
               'id': rowsFromMetaChar[i].id,
               'value': null,
               'total': rowsFromMetaChar[i].value,
@@ -121,23 +133,18 @@ let getSpecificProductMeta = function (request, response, next) {
           }
         }
 
+        //this part calculates value which an average of the ratings for each category (total ratings/number ratings per category)
         for (var key in characteristics) {
           characteristics[key].value = characteristics[key].total / characteristics[key].counter;
           delete characteristics[key].total;
           delete characteristics[key].counter;
         }
-
-
         metaData.characteristics = characteristics;
-
         response.send(metaData);
-        //response.send(characteristics);
-
       })
       .catch(function(err) {
         console.log('error in getSpecificProductMeta in connectionPostgresQueries.js');
         response.send(err);
-        return next(err);
       });
   } else {
     response.send('Product ID must be defined');

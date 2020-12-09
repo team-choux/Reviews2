@@ -15,7 +15,7 @@ router.get('/test', (req, res) => {
 });
 
 
-router.get('/reviews/', dbQueries. getSpecificProductReviews);
+router.get('/reviews/', dbQueries.getSpecificProductReviews);
 router.get('/reviews/meta', dbQueries.getSpecificProductMeta);
 
 

@@ -15,9 +15,12 @@ SELECT * FROM meta_characteristics LIMIT 10;
 */
 
 
-CREATE TABLE TESTING4 AS
-SELECT reviews.product_id, reviews.id, reviews.rating, reviews.summary, reviews.recommended, reviews.response, reviews.body, reviews.date, reviews.reviewer_name, reviews.helpfulness, reviews_photos.url
-FROM reviews
-INNER JOIN reviews_photos
-ON reviews.id=reviews_photos.review_ID
-LIMIT 10;
+
+
+
+
+
+
+
+
+
