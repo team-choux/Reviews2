@@ -31,7 +31,7 @@ recommend_true INT,
 recommend_false INT
 );
 
---index product_id
+--index product_id-
 create index product_id_meta on meta(product_id);
 
 explain analyze
@@ -47,3 +47,12 @@ WHERE
 )
 WHERE
    meta.product_id=1;
+
+/*
+COPY meta(id, product_id, one_star, two_star, three_star, four_star, five_star, recommend_true, recommend_false)
+FROM '/home/ubuntu/csv/meta.csv'
+DELIMITER ','
+CSV HEADER;
+
+create index product_id on meta(product_id);
+*/

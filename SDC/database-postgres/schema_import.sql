@@ -3,6 +3,7 @@
 sudo su postgres
 psql -f SDC/database-postgres/schema_import.sql
 
+CREATE DATABASE reviewsDB;
 */
 
 \c reviewsDB;
@@ -60,7 +61,7 @@ DELIMITER ','
 CSV HEADER;
 */
 
---create reviews table (2.0GB) -------------------------------------------------------------------
+--create reviews table (2.0GB) --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS reviews (
   id INT NOT NULL PRIMARY KEY,
   product_id INT NOT NULL,

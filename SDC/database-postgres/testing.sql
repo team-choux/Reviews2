@@ -1,5 +1,5 @@
 /*
-
+*
 sudo su postgres
 psql -f SDC/database-postgres/organizing_tables.sql
 
@@ -158,3 +158,7 @@ WHERE characteristic_id=(
 --test: select * from meta_characteristics;
 
 
+COPY reviews(id, product_id, rating, date, summary, body, recommended, reported, reviewer_name, reviewer_email, response, helpfulness)
+FROM '/home/ubuntu/csv/reviews.csv'
+DELIMITER ','
+CSV HEADER;

@@ -1,0 +1,27 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    # creates 5 virtual users every second for 60 seconds
+    - duration: 60
+      arrivalRate: 5
+      name: Warm up
+    # begins with 5 virtual users every second
+    # ramp up arrival rate of virtual users from 5 to 50
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    # 600 seconds (10 minutes) at 50 virtual users per second
+    - duration: 600
+      arrivalRate: 50
+      name: Sustained load
+scenarios:
+  # We define one scenario:
+  - name: "get meta data"
+    flow:
+      # Get the details of the product:
+      - get:
+          url: "/reviews/meta/?product_id={{id}}"
+#artillery run -v '{"id": ["1", "2", "3"]}' loadTest.yml
+
+#/reviews/meta/?product_id={{id}}

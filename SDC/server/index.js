@@ -20,6 +20,22 @@ for this reason, it is often referred to as a “mini-app”.
 const port = 3000;
 
 
+
+/*configures client which attaches to statsD daemon*/
+//default port to send stats to is 8125
+// const StatsD = require('node-statsd');
+// const client = new StatsD({
+//   "prefix":"coolNew_"
+// })
+
+// app.get('/', (req, res) => {
+//   client.increment('new_root_request');
+//   console.log("sent")
+//   res.send('Hello World');
+// })
+/*****/
+
+
 app.use(express.json());
 app.use('/', routes);
 

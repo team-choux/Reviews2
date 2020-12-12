@@ -7,7 +7,7 @@ let updateMetaStarRatings = function (productIdStart, productIdStop) {
   let starRatingFields = ['one_star', 'two_star', 'three_star', 'four_star', 'five_star'];
   let starRatingFieldValues = [1, 2, 3, 4, 5];
 
-  //outer loop: each of the different star fields in the meta table
+  //outer loop: each of the different star fields in the meta table-
   for (var i = 0; i < starRatingFields.length; i++) {
     let currentStarRatingField = starRatingFields[i];
     let currentStarRatingFieldValue = starRatingFieldValues[i];

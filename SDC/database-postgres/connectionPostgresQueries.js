@@ -1,7 +1,10 @@
 const pgp = require('pg-promise')();
+//zero-dependency module that loads environment variables from a .env file into process.env (tldr; stores configuration in the environment separate from code).
+require('dotenv').config();
 
 //Method 1: lines 4-5
-var connectionString = 'postgres://postgres:Password1@localhost:5432/reviewsDB';
+//var connectionString = 'postgres://postgres:Password1@localhost:5432/reviewsDB';
+var connectionString = `postgres://postgres:${process.env.PASSWORD}@${process.env.HOST}:${process.env.PORT}/${process.env.DATABASE}`;
 const db = pgp(connectionString);
 
 // //Method 2: lines 8-18
@@ -157,5 +160,6 @@ let getSpecificProductMeta = function (request, response) {
 module.exports = {
   db: db,
   getSpecificProductReviews: getSpecificProductReviews,
-  getSpecificProductMeta: getSpecificProductMeta
+  getSpecificProductMeta: getSpecificProductMeta,
+
 };
